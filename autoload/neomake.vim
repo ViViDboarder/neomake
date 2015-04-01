@@ -105,6 +105,8 @@ function! neomake#GetMaker(name, makepath, ...) abort
     endif
     if type(a:name) == type({})
         let maker = a:name
+    elseif a:name =~ '{'
+        let maker = eval(a:name)
     else
         if a:name ==# 'makeprg'
             let maker = neomake#utils#MakerFromCommand(&shell, &makeprg)
@@ -131,7 +133,9 @@ function! neomake#GetMaker(name, makepath, ...) abort
     if !has_key(maker, 'exe')
         let maker.exe = a:name
     endif
-    let maker.name = a:name
+    if !has_key(maker, 'name')
+        let maker.name = a:name
+    endif
     let maker.ft = ft
     " Only relevant if file_mode is used
     let maker.winnr = winnr()
